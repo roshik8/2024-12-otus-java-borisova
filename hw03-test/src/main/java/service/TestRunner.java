@@ -1,6 +1,10 @@
+package service;
+
 import annotation.After;
 import annotation.Before;
 import annotation.Test;
+import model.TestResult;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -8,38 +12,30 @@ import java.util.List;
 
 public class TestRunner {
 
-    public static void run(String className) {
+    public static TestResult run(String className) {
+        TestResult result = new TestResult(); // Создаем объект для хранения результатов
+
         try {
             Class<?> testClass = Class.forName(className);
             Method[] methods = testClass.getDeclaredMethods();
-
-            int passed = 0, failed = 0;
-            List<String> passedTests = new ArrayList<>();
-            List<String> failedTests = new ArrayList<>();
 
             for (Method testMethod : getMethodsByAnnotation(methods, Test.class)) {
                 Object testInstance = testClass.getDeclaredConstructor().newInstance();
                 try {
                     runMethods(testInstance, getMethodsByAnnotation(methods, Before.class));
                     runSingleTest(testInstance, testMethod);
-                    passedTests.add(testMethod.getName());
-                    passed++;
+                    result.addPassedTest(testMethod.getName());
                 } catch (Exception e) {
-                    failedTests.add(testMethod.getName());
-                    failed++;
+                    result.addFailedTest(testMethod.getName());
                 } finally {
                     runMethods(testInstance, getMethodsByAnnotation(methods, After.class));
                 }
             }
-            System.out.println("Результаты:");
-            System.out.printf("Пройдено тестов %d, названия тестов %s%n", passed, passedTests);
-
-            System.out.printf("Провалено тестов %d, названия тестов %s%n", failed, failedTests);
-            System.out.println("Всего: " + (passed + failed));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return result;
     }
 
     private static List<Method> getMethodsByAnnotation(Method[] methods, Class<? extends Annotation> annotation) {

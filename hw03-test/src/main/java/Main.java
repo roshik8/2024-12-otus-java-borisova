@@ -1,5 +1,10 @@
+import model.TestResult;
+import service.TestRunner;
+
 public class Main {
     public static void main(String[] args) {
-        TestRunner.run("AnnotationTest");
+
+        TestResult result = TestRunner.run("test.AnnotationTest");
+        System.out.println(result);
     }
 }
