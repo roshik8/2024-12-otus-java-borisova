@@ -1,8 +1,8 @@
 rootProject.name = "2024-12-otus-java-borisova"
 include("hw01-gradle")
 include("hw02-generics")
+include("hw03-test")
 include("hw04-gc")
-
 
 pluginManagement {
     val jgitver: String by settings
