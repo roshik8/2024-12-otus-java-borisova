@@ -1,14 +1,12 @@
 package ru.atm;
 
 
-import java.util.Arrays;
-
 public class AtmDemo {
 
     public static void main(String[] args) {
-        Atm atm = new SimpleAtm(Arrays.asList(100, 500, 1000, 5000));
-        atm.upBalance(1000, 5);
-        atm.upBalance(500, 10);
+        Atm atm = new SimpleAtm();
+        atm.upBalance(Nominal.ONE_THOUSAND, 5);
+        atm.upBalance(Nominal.FIVE_HUNDRED, 10);
         System.out.println(atm);
 
         try {

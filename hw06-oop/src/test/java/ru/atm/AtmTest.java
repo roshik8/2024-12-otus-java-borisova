@@ -3,7 +3,6 @@ package ru.atm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,46 +12,46 @@ private Atm atm;
 
     @BeforeEach
     void setUp() {
-      atm = new SimpleAtm(Arrays.asList(100, 500, 1000, 5000));
+      atm = new SimpleAtm();
     }
 
     @Test
     void testDepositAndBalance() {
-        atm.upBalance(1000, 5);
-        atm.upBalance(500, 10);
+        atm.upBalance(Nominal.ONE_THOUSAND, 5);
+        atm.upBalance(Nominal.FIVE_HUNDRED, 10);
         assertEquals(10000, atm.getBalance());
     }
 
     @Test
     void testWithdrawValidAmount() {
-        atm.upBalance(1000, 5);
-        atm.upBalance(500, 10);
-        Map<Integer, Integer> withdrawn = atm.withdrawMoney(4500);
-        assertEquals(Map.of(1000, 4, 500, 1), withdrawn);
+        atm.upBalance(Nominal.ONE_THOUSAND, 5);
+        atm.upBalance(Nominal.FIVE_HUNDRED, 10);
+        Map<Nominal, Integer> withdrawn = atm.withdrawMoney(4500);
+        assertEquals(Map.of(Nominal.ONE_THOUSAND, 4, Nominal.FIVE_HUNDRED, 1), withdrawn);
         assertEquals(5500, atm.getBalance());
     }
 
     @Test
     void testWithdrawInvalidAmount() {
-        atm.upBalance(1000, 2);
-        atm.upBalance(500, 1);
+        atm.upBalance(Nominal.ONE_THOUSAND, 2);
+        atm.upBalance(Nominal.FIVE_HUNDRED, 1);
         assertThrows(IllegalArgumentException.class, () -> atm.withdrawMoney(300));
     }
 
     @Test
     void testWithdrawMoreThanAvailable() {
-        atm.upBalance(1000, 2);
-        atm.upBalance(500, 1);
+        atm.upBalance(Nominal.ONE_THOUSAND, 2);
+        atm.upBalance(Nominal.FIVE_HUNDRED, 1);
         assertThrows(IllegalArgumentException.class, () -> atm.withdrawMoney(5000));
     }
 
     @Test
     void testDepositInvalidDenomination() {
-        assertThrows(IllegalArgumentException.class, () -> atm.upBalance(200, 5));
+        assertThrows(IllegalArgumentException.class, () -> atm.upBalance(null, 5));
     }
 
     @Test
     void testDepositNegativeCount() {
-        assertThrows(IllegalArgumentException.class, () -> atm.upBalance(1000, -3));
+        assertThrows(IllegalArgumentException.class, () -> atm.upBalance(Nominal.ONE_THOUSAND, -3));
     }
 }

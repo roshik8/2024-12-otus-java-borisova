@@ -3,47 +3,49 @@ package ru.atm;
 import java.util.*;
 
 public class SimpleAtm implements Atm {
-    private final TreeMap<Integer, Integer> moneyBox;
+    private final List<AtmCell> moneyBox;
 
-    public SimpleAtm(List<Integer> denominations) {
-        moneyBox = new TreeMap<>(Collections.reverseOrder());
-        for (int d : denominations) {
-            moneyBox.put(d, 0);
+    public SimpleAtm() {
+        moneyBox = new ArrayList<>();
+        for (Nominal nominal : Nominal.values()) {
+            moneyBox.add(new AtmCell(nominal, 0));
         }
     }
 
     @Override
-    public void upBalance(int denomination, int count) {
-        if (!moneyBox.containsKey(denomination)) {
-            throw new IllegalArgumentException(String.format("Банкомат не принимает купюры номиналом %d", denomination));
-        }
-        if (count <= 0) {
-            throw new IllegalArgumentException("Количество банкнот должно быть положительным");
-        }
-        moneyBox.put(denomination, moneyBox.get(denomination) + count);
+    public void upBalance(Nominal nominal, int count) {
+        moneyBox.stream()
+                .filter(cell -> cell.getNominal() == nominal)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Номинал не поддерживается банкоматом"))
+                .addBanknotes(count);
     }
 
     @Override
-    public Map<Integer, Integer> withdrawMoney(int amount) {
+    public Map<Nominal, Integer> withdrawMoney(int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Сумма должна быть положительной");
         }
 
-        Map<Integer, Integer> originalBox = new TreeMap<>(moneyBox);
-        Map<Integer, Integer> withdrawnMoney = new HashMap<>();
+        List<AtmCell> originalBox = new ArrayList<>();
+        for (AtmCell cell : moneyBox) {
+            originalBox.add(new AtmCell(cell.getNominal(), cell.getCount()));
+        }
+        Map<Nominal, Integer> withdrawnMoney = new HashMap<>();
 
-        for (int denomination : moneyBox.keySet()) {
-            int numNotes = Math.min(amount / denomination, moneyBox.get(denomination));
+        moneyBox.sort(Comparator.comparing((AtmCell cell) -> cell.getNominal().getValue()).reversed());
+        for (AtmCell cell : moneyBox) {
+            int numNotes = Math.min(amount / cell.getNominal().getValue(), cell.getCount());
             if (numNotes > 0) {
-                withdrawnMoney.put(denomination, numNotes);
-                amount -= denomination * numNotes;
-                moneyBox.put(denomination, moneyBox.get(denomination) - numNotes);
+                withdrawnMoney.put(cell.getNominal(), numNotes);
+                amount -= cell.getNominal().getValue() * numNotes;
+                cell.withdrawBanknotes(numNotes);
             }
         }
 
         if (amount > 0) {
             moneyBox.clear();
-            moneyBox.putAll(originalBox);
+            moneyBox.addAll(originalBox);
             throw new IllegalArgumentException("Невозможно выдать запрошенную сумму");
         }
 
@@ -52,7 +54,7 @@ public class SimpleAtm implements Atm {
 
     @Override
     public int getBalance() {
-        return moneyBox.entrySet().stream().mapToInt(e -> e.getKey() * e.getValue()).sum();
+        return moneyBox.stream().mapToInt(cell -> cell.getNominal().getValue() * cell.getCount()).sum();
     }
 
     @Override
