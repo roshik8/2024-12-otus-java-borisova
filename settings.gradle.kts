@@ -6,6 +6,8 @@ include("hw04-gc")
 include("hw05-byteCodes")
 include("hw06-oop")
 
+include("hw08-io")
+
 pluginManagement {
     val jgitver: String by settings
     val dependencyManagement: String by settings
