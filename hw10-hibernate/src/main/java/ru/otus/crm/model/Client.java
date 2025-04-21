@@ -56,7 +56,7 @@ public class Client implements Cloneable {
     public Client clone() {
         Address clonedAddress = address == null ? null : new Address(address.getId(), address.getStreet());
 
-        List<Phone> clonedPhones = new ArrayList<>();
+        List<Phone> clonedPhones = phones == null ? null : new ArrayList<>();
         if (phones != null) {
             for (Phone phone : phones) {
                 Phone clonedPhone = new Phone(phone.getId(), phone.getNumber());
