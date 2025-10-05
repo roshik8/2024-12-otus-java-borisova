@@ -9,24 +9,24 @@ import org.slf4j.LoggerFactory;
 
 public class MyCache<K, V> implements HwCache<K, V> {
     private static final Logger log = LoggerFactory.getLogger(MyCache.class);
-    private final Map<K, V> cache = new WeakHashMap<>();
+    private final Map<MyKey<K>, V> cache = new WeakHashMap<>();
     private final List<HwListener<K, V>> listeners = new ArrayList<>();
 
     @Override
     public void put(K key, V value) {
-        cache.put(key, value);
+        cache.put(new MyKey<>(key), value);
         notifyListeners(key, value, "put");
     }
 
     @Override
     public void remove(K key) {
-        notifyListeners(key, cache.get(key), "remove");
-        cache.remove(key);
+        cache.remove(new MyKey<>(key));
+        notifyListeners(key, null, "remove");
     }
 
     @Override
     public V get(K key) {
-        V value = cache.get(key);
+        V value = cache.get(new MyKey<>(key));
         notifyListeners(key, value, "get");
         return value;
     }
@@ -59,4 +59,5 @@ public class MyCache<K, V> implements HwCache<K, V> {
             }
         });
     }
+        private record MyKey<K>(K key) {}
 }
