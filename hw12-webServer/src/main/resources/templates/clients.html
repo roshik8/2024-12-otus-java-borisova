@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиенты</title>
+    <script>
+        function getClientById() {
+            const clientIdTextBox = document.getElementById('clientIdTextBox');
+            const clientDataContainer = document.getElementById('clientDataContainer');
+            const id = clientIdTextBox.value;
+            fetch('api/client/' + id)
+                .then(response => response.json())
+                .then(client => clientDataContainer.innerHTML = JSON.stringify(client));
+        }
+    </script>
+</head>
+<body>
+
+<h3>Добавить нового клиента</h3>
+<form method="post" action="/clients">
+    <label>Имя:<br>
+        <input type="text" name="name" required>
+    </label><br><br>
+
+    <label>Адрес:<br>
+        <input type="text" name="address" required>
+    </label><br><br>
+
+    <label>Телефон:<br>
+        <input type="text" name="phone" required>
+    </label><br><br>
+
+    <button type="submit">Создать клиента</button>
+</form>
+
+<h4>Получить пользователя по id</h4>
+<input type="text" id = "clientIdTextBox" value="3" placeholder="Введите id пользователя">
+<button onclick="getClientById()">Получить</button>
+<pre id = "clientDataContainer"></pre>
+
+<h2>Список клиентов</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Адрес</th>
+        <th>Телефон</th>
+    </tr>
+    </thead>
+    <tbody>
+    <#if clients?? && (clients?size > 0)>
+    <#list clients as client>
+    <tr>
+        <td>${client.id}</td>
+        <td>${client.name}</td>
+        <td>
+            <#if client.address??>
+            ${client.address.street}
+            <#else>
+            -
+        </#if>
+        </td>
+        <td>
+            <#if client.phones?? && (client.phones?size > 0)>
+            <#list client.phones as phone>
+            ${phone.number}<#if phone_has_next>, </#if>
+    </#list>
+    <#else>
+    -
+    </#if>
+    </td>
+    </tr>
+    </#list>
+    <#else>
+    <tr><td colspan="4">Нет клиентов</td></tr>
+</#if>
+</tbody>
+</table>
+
+<hr>
+
+</body>
+</html>
