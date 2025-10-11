@@ -42,6 +42,9 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         for (Method method : componentMethods) {
             AppComponent annotation = method.getAnnotation(AppComponent.class);
             String componentName = annotation.name();
+            if (appComponentsByName.containsKey(componentName)) {
+                throw new IllegalArgumentException("Дубликат компонента с именем: " + componentName);
+            }
             Object component = createComponent(configInstance, method);
             registerComponent(componentName, component);
         }
@@ -59,9 +62,6 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     }
 
     private void registerComponent(String componentName, Object component) {
-        if (appComponentsByName.containsKey(componentName)) {
-            throw new IllegalArgumentException("Дубликат компонента с именем: " + componentName);
-        }
         appComponents.add(component);
         appComponentsByName.put(componentName, component);
     }
