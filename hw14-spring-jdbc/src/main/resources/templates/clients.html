@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиенты</title>
+</head>
+<body>
+
+<h3>Добавить нового клиента</h3>
+<form method="post" action="/clients">
+    <label>Имя:<br>
+        <input type="text" name="name" required>
+    </label><br><br>
+
+    <label>Адреса (через ;):<br>
+        <input type="text" name="addresses" placeholder="Адрес1;Адрес2">
+    </label><br><br>
+
+    <label>Телефоны (через ;):<br>
+        <input type="text" name="phones" placeholder="111-111;222-222">
+    </label><br><br>
+
+    <button type="submit">Создать клиента</button>
+</form>
+
+<h2>Список клиентов</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Адреса</th>
+        <th>Телефоны</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.id}"></td>
+        <td th:text="${client.name}"></td>
+
+        <td>
+    <span th:if="${client.addresses != null}">
+        <span th:each="addr, iter : ${client.addresses}">
+            <span th:text="${addr.street}"></span><span th:if="${!iter.last}">, </span>
+        </span>
+    </span>
+            <span th:if="${client.addresses == null or #lists.isEmpty(client.addresses)}">-</span>
+        </td>
+
+        <td>
+    <span th:if="${client.phones != null}">
+        <span th:each="phone, iter : ${client.phones}">
+            <span th:text="${phone.number}"></span><span th:if="${!iter.last}">, </span>
+        </span>
+    </span>
+            <span th:if="${client.phones == null or #lists.isEmpty(client.phones)}">-</span>
+        </td>
+    </tr>
+
+    <tr th:if="${clients == null or #lists.isEmpty(clients)}">
+        <td colspan="4">Нет клиентов</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
