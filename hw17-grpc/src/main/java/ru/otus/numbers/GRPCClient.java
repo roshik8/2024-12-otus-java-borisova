@@ -26,8 +26,6 @@ public class GRPCClient {
 
         var latch = new CountDownLatch(1);
         AtomicLong lastServerValue = new AtomicLong(0);
-        AtomicBoolean newValueAvailable = new AtomicBoolean(false);
-
         asyncStub.streamNumber(
                 NumbersRequest.newBuilder().setFirstValue(FIRST_VALUE).setLastValue(LAST_VALUE).build(),
                 new StreamObserver<NumbersResponse>() {
@@ -35,7 +33,6 @@ public class GRPCClient {
                     public void onNext(NumbersResponse value) {
                         long v = value.getValue();
                         lastServerValue.set(v);
-                        newValueAvailable.set(true);
                         System.out.println("новое значение: " + v);                    }
 
                     @Override
@@ -53,11 +50,7 @@ public class GRPCClient {
 
         long currentValue = 0;
         for (int i = 0; i < COUNT; i++) {
-            if (newValueAvailable.getAndSet(false)) {
-                currentValue = currentValue + lastServerValue.get() + 1;
-            } else {
-                currentValue = currentValue + 1;
-            }
+            currentValue = currentValue + lastServerValue.getAndSet(0) + 1;
             System.out.println("текущее значение: " + currentValue);
             Thread.sleep(1000);
         }
