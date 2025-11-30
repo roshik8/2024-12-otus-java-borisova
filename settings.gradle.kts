@@ -17,6 +17,9 @@ include("hw14-spring-jdbc")
 include("hw15-thread")
 include("hw16-cc")
 include("hw17-grpc")
+include("hw18-webflux")
+include ("hw18-webflux:client-service")
+include ("hw18-webflux:datastore-service")
 
 pluginManagement {
     val jgitver: String by settings
